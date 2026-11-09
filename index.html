@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Security Journey</title>
+<meta name="description" content="My week-by-week tracker from web developer to Application Security engineer.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f7f9;--surface:#ffffff;--surface2:#eef1f4;--text:#0f172a;--muted:#5b6475;--border:#dde2e8;
+  --accent:#0a8f62;--accent-soft:#e1f5ec;--warn:#a85a00;--warn-soft:#fdf1e1;--link:#0b63c4;
+  --c-main:#7c3aed;--c-found:#0369a1;--c-code:#b45309;--c-repo:#0a8f62;--c-check:#be123c;
+  --heat0:#e3e8ee;--heat1:#0a8f62;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b0f14;--surface:#121820;--surface2:#19212b;--text:#e6edf3;--muted:#8b98a8;--border:#24303d;
+    --accent:#3ddc97;--accent-soft:#10281e;--warn:#f0a44b;--warn-soft:#2a1d0e;--link:#6cb6ff;
+    --c-main:#b794f6;--c-found:#5cc4ff;--c-code:#f6b35c;--c-repo:#3ddc97;--c-check:#ff7a93;
+    --heat0:#1d2632;--heat1:#3ddc97;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b0f14;--surface:#121820;--surface2:#19212b;--text:#e6edf3;--muted:#8b98a8;--border:#24303d;
+  --accent:#3ddc97;--accent-soft:#10281e;--warn:#f0a44b;--warn-soft:#2a1d0e;--link:#6cb6ff;
+  --c-main:#b794f6;--c-found:#5cc4ff;--c-code:#f6b35c;--c-repo:#3ddc97;--c-check:#ff7a93;
+  --heat0:#1d2632;--heat1:#3ddc97;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:15px/1.55 Inter,system-ui,-apple-system,Segoe UI,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+code,.mono{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace;font-size:.88em}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 64px}
+header .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+h1{font-family:"JetBrains Mono",monospace;font-size:clamp(20px,4.5vw,28px);margin:0;letter-spacing:-.02em}
+h1 .p{color:var(--accent)}
+.sub{color:var(--muted);margin:4px 0 0}
+.iconbtn{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;font-size:13px;white-space:nowrap}
+.iconbtn:hover{border-color:var(--accent)}
+.bar{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden;margin:18px 0 6px}
+.bar>i{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+.barlabel{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font-size:24px;font-family:"JetBrains Mono",monospace;line-height:1.2}
+.stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+nav{display:flex;gap:6px;margin:24px 0 18px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+nav button{flex:none;background:transparent;border:1px solid var(--border);color:var(--muted);padding:8px 14px;border-radius:99px;cursor:pointer;font:inherit;font-size:14px;font-weight:500}
+nav button[aria-selected="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+section[hidden]{display:none}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+.card h2{font-size:17px;margin:0 0 10px}
+.card h3{font-size:15px;margin:16px 0 6px}
+.muted{color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.logbtn{background:var(--accent);color:var(--bg);border:0;border-radius:10px;padding:12px 18px;font:inherit;font-weight:700;cursor:pointer;font-size:15px}
+.logbtn[disabled]{opacity:.55;cursor:default}
+.alert{border-radius:10px;padding:10px 12px;font-size:14px;margin-top:12px}
+.alert.warn{background:var(--warn-soft);color:var(--warn)}
+.alert.ok{background:var(--accent-soft);color:var(--accent)}
+.heat{display:grid;grid-template-rows:repeat(7,12px);grid-auto-flow:column;grid-auto-columns:12px;gap:3px;margin-top:14px;overflow-x:auto}
+.heat i{width:12px;height:12px;border-radius:3px;background:var(--heat0)}
+.heat i.on{background:var(--heat1)}
+.heat i.today{outline:1.5px solid var(--text);outline-offset:1px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--border);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+details.week{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden}
+details.week.current{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+details.week>summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;align-items:center;gap:12px}
+details.week>summary::-webkit-details-marker{display:none}
+.wk{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted);min-width:58px}
+.wtitle{flex:1;font-weight:600}
+.badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.badge.cp{color:var(--c-check)}
+.badge.now{background:var(--accent-soft);color:var(--accent)}
+.count{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--muted);min-width:42px;text-align:right}
+.count.full{color:var(--accent);font-weight:700}
+.mini{height:4px;background:var(--surface2)}
+.mini>i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+ul.tasks{list-style:none;margin:0;padding:6px 16px 14px}
+ul.tasks li{display:flex;gap:10px;padding:9px 0;border-top:1px dashed var(--border)}
+ul.tasks li:first-child{border-top:0}
+ul.tasks input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent);flex:none;cursor:pointer}
+ul.tasks label{cursor:pointer}
+ul.tasks li.done label .t{color:var(--muted);text-decoration:line-through}
+.cat{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-right:6px}
+.cat.main{color:var(--c-main)}.cat.found{color:var(--c-found)}.cat.code{color:var(--c-code)}.cat.repo{color:var(--c-repo)}.cat.check{color:var(--c-check)}
+.links{display:block;font-size:13px;margin-top:2px}
+.links a{margin-right:12px;white-space:nowrap}
+.links a::before{content:"↗ ";opacity:.6}
+pre.tree{background:var(--surface2);border-radius:10px;padding:14px;overflow-x:auto;font-size:13px;line-height:1.6;margin:8px 0}
+.res{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.res ul{margin:0;padding-left:18px}
+.res li{margin:5px 0;font-size:14px}
+.rules li{margin:8px 0}
+.foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:30px;padding-top:18px;border-top:1px solid var(--border);align-items:center}
+.foot .muted{font-size:13px;flex-basis:100%}
+input[type=date]{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font:inherit}
+@media (max-width:640px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .grid2{grid-template-columns:1fr}
+  .wk{min-width:44px}
+  details.week>summary{gap:8px;padding:12px}
+  .badge.hide-sm{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="top">
+    <div>
+      <h1><span class="p">~/</span>security-journey</h1>
+      <p class="sub">Web developer → AppSec → Google. One lab at a time.</p>
+    </div>
+    <button class="iconbtn" id="themeBtn" title="Toggle theme">◐ Theme</button>
+  </div>
+  <div class="bar"><i id="totalBar"></i></div>
+  <div class="barlabel"><span id="totalLabel">0% complete</span><span id="phaseLabel"></span></div>
+  <div class="stats">
+    <div class="stat"><b id="sStreak">0</b><span>Day streak 🔥</span></div>
+    <div class="stat"><b id="sDays">0</b><span>Days logged</span></div>
+    <div class="stat"><b id="sTasks">0</b><span>Tasks done</span></div>
+    <div class="stat"><b id="sWeek">1</b><span>Current week</span></div>
+  </div>
+</header>
+
+<nav role="tablist">
+  <button data-tab="today" aria-selected="true">Today</button>
+  <button data-tab="weeks">Weeks 1–12</button>
+  <button data-tab="months">Months 4–12+</button>
+  <button data-tab="repo">Repo guide</button>
+  <button data-tab="resources">Resources</button>
+  <button data-tab="rules">Rules</button>
+</nav>
+
+<!-- TODAY -->
+<section id="today">
+  <div class="grid2">
+    <div class="card">
+      <h2>Daily check-in</h2>
+      <p class="muted" style="margin:0 0 12px">Did your 5–6 hours today? Log it. Never miss two days in a row.</p>
+      <button class="logbtn" id="logBtn">✓ I studied today</button>
+      <div id="streakMsg"></div>
+      <div class="heat" id="heat" aria-label="Last 12 weeks of study days"></div>
+    </div>
+    <div class="card">
+      <h2>Daily routine</h2>
+      <table>
+        <tr><th>Block</th><th>Time</th><th>What</th></tr>
+        <tr><td>🧱 Foundations</td><td class="mono">1h</td><td>Linux, networking, how systems work</td></tr>
+        <tr><td>⚔️ Main track</td><td class="mono">2.5–3h</td><td>Hands-on labs: break things</td></tr>
+        <tr><td>🐍 Code</td><td class="mono">1h</td><td>Python tools, later DSA</td></tr>
+        <tr><td>✍️ Write</td><td class="mono">30m</td><td>Notes + public write-up, commit</td></tr>
+      </table>
+      <p class="muted" style="font-size:13px;margin:10px 0 0">Sunday = light day: review the week + one blog post. VU classes come first, always.</p>
+    </div>
+  </div>
+  <div class="card">
+    <h2 id="thisWeekTitle">This week</h2>
+    <div id="thisWeek"></div>
+    <p style="font-size:13px;margin:12px 0 0" class="muted">Started on <input type="date" id="startDate"> · the current week is calculated from this date.</p>
+  </div>
+</section>
+
+<!-- WEEKS -->
+<section id="weeks" hidden>
+  <p class="muted" style="margin-top:0">Main resource: <a href="https://portswigger.net/web-security" target="_blank" rel="noopener">PortSwigger Web Security Academy</a>. No video courses for the first 3 months, only labs.</p>
+  <div id="weekList"></div>
+</section>
+
+<!-- MONTHS -->
+<section id="months" hidden>
+  <div id="monthList"></div>
+</section>
+
+<!-- REPO -->
+<section id="repo" hidden>
+  <div class="card">
+    <h2>What lives in your repo</h2>
+    <p class="muted" style="margin-top:0">This site <em>is</em> your repo: <a href="https://github.com/RamZan457/security-journey" target="_blank" rel="noopener">github.com/RamZan457/security-journey</a>. Every folder has its own README that explains what to put inside.</p>
+<pre class="tree">security-journey/
+├── index.html              ← this tracker (GitHub Pages)
+├── README.md               ← your public profile and progress log
+├── daily-log/LOG.md        ← one line per day: what you did
+├── writeups/
+│   ├── _TEMPLATE.md        ← copy for every write-up
+│   ├── portswigger/        ← one file per lab topic
+│   ├── bandit/             ← OverTheWire notes
+│   ├── picoctf/
+│   └── ctf/                ← CTF events from CTFtime
+├── notes/                  ← linux.md, networking.md, http.md, owasp-top10.md
+├── tools/                  ← Python tools YOU write (specs included)
+├── vuln-app/               ← week 5: your intentionally vulnerable app
+├── code-review/            ← audits of open-source projects
+├── bug-bounty/             ← methodology only (findings stay private!)
+└── retros/                 ← week-4, week-8, week-12 reviews</pre>
+    <h3>Your daily git rhythm</h3>
+<pre class="tree">git pull
+# ... study, write notes, add a write-up ...
+echo "- 2026-11-10: SQLi labs 1-6, Bandit 0-4" >> daily-log/LOG.md
+git add .
+git commit -m "day 2: sqli apprentice labs + bandit 0-4"
+git push</pre>
+    <h3>Rules for the repo</h3>
+    <ul class="rules">
+      <li><b>Commit every study day.</b> The green squares on your GitHub profile prove you're consistent.</li>
+      <li><b>Write-ups in your own words.</b> Explain the <em>why</em>, not only the payload. Recruiters read these.</li>
+      <li><b>Never publish real bug details</b> from bug bounty programs until they're fixed <em>and</em> the program allows disclosure. Real findings go in <code>bug-bounty/private/</code>, which git ignores.</li>
+      <li><b>The tools are for you to build.</b> Each folder in <code>tools/</code> has a spec. Writing them yourself is the exercise.</li>
+      <li><b>Your vulnerable app runs on localhost only.</b> Never deploy it publicly.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- RESOURCES -->
+<section id="resources" hidden>
+  <div class="res" id="resList"></div>
+</section>
+
+<!-- RULES -->
+<section id="rules" hidden>
+  <div class="card">
+    <h2>Rules so you don't quit again</h2>
+    <ol class="rules">
+      <li><b>Never miss two days in a row.</b> One bad day is life. Two is the start of quitting.</li>
+      <li><b>Labs, not videos.</b> You quit Wi-Fi hacking and Burp while <em>watching</em>. You won't quit while <em>breaking</em> things.</li>
+      <li><b>One resource at a time.</b> PortSwigger is the main track. Don't add a new course until this one is finished.</li>
+      <li><b>Stuck for 30 minutes?</b> Read the solution, understand it, then redo the lab without looking. Ego kills momentum.</li>
+      <li><b>Finish proves the doubt wrong.</b> Every checked box and every write-up is evidence. Doubt comes from unfinished things.</li>
+      <li><b>Protect your VU degree.</b> It's your ticket to the Google internship. Attendance first.</li>
+      <li><b>Consistency beats intensity.</b> 5 focused hours every day beats 14 hours for a week and then burnout.</li>
+      <li><b>Learn in public.</b> Post a weekly progress update on LinkedIn or X.</li>
+    </ol>
+  </div>
+  <div class="card" style="border-color:var(--c-check)">
+    <h2>⚖️ The legal line</h2>
+    <p style="margin:0">Only test systems you <b>own</b> or have <b>written permission</b> to test: labs, CTFs, your own apps, and in-scope bug bounty targets. Hacking without permission is a crime and can end a security career before it starts.</p>
+  </div>
+</section>
+
+<div class="foot">
+  <span class="muted">Progress is saved in this browser only. Export a backup now and then, and import it on another device.</span>
+  <button class="iconbtn" id="exportBtn">⬇ Export backup</button>
+  <label class="iconbtn" for="importFile">⬆ Import backup</label>
+  <input type="file" id="importFile" accept="application/json" hidden>
+  <button class="iconbtn" id="resetBtn">Reset all</button>
+</div>
+</div>
+
+<script>
+const PS = s => "https://portswigger.net/web-security/" + s;
+const L = {
+  bandit:["OverTheWire Bandit","https://overthewire.org/wargames/bandit/"],
+  burpStart:["Burp: getting started","https://portswigger.net/burp/documentation/desktop/getting-started"],
+  repo:["Your repo","https://github.com/RamZan457/security-journey"],
+  messer:["Professor Messer (Network+)","https://www.professormesser.com/"],
+  wireshark:["Wireshark","https://www.wireshark.org/"],
+  mdnHttp:["MDN: HTTP","https://developer.mozilla.org/en-US/docs/Web/HTTP"],
+  linuxJourney:["Linux Journey","https://linuxjourney.com/"],
+  thmPrivesc:["THM: Linux PrivEsc","https://tryhackme.com/room/linprivesc"],
+  pico:["picoCTF practice","https://play.picoctf.org/practice"],
+  owasp10:["OWASP Top 10","https://owasp.org/www-project-top-ten/"],
+  cheat:["OWASP Cheat Sheets","https://cheatsheetseries.owasp.org/"],
+  neet:["NeetCode roadmap","https://neetcode.io/roadmap"],
+  leet:["LeetCode","https://leetcode.com/problemset/"],
+  requests:["requests docs","https://requests.readthedocs.io/"],
+  hacktivity:["HackerOne Hacktivity","https://hackerone.com/hacktivity"],
+  h1dir:["HackerOne programs","https://hackerone.com/directory/programs"],
+  bugcrowd:["Bugcrowd programs","https://bugcrowd.com/engagements"],
+  subfinder:["subfinder","https://github.com/projectdiscovery/subfinder"],
+  httpx:["httpx","https://github.com/projectdiscovery/httpx"],
+  ffuf:["ffuf","https://github.com/ffuf/ffuf"],
+  ctftime:["CTFtime","https://ctftime.org/"],
+  ghvrp:["Google Bug Hunters","https://bughunters.google.com/"],
+  flaws:["flaws.cloud","http://flaws.cloud/"],
+  flaws2:["flaws2.cloud","http://flaws2.cloud/"],
+  bscp:["BSCP certification","https://portswigger.net/web-security/certification"],
+  oswe:["OffSec OSWE","https://www.offsec.com/courses/web-300/"],
+  gcareers:["Google Careers","https://www.google.com/about/careers/applications/"],
+  htbAcademy:["HTB Academy","https://academy.hackthebox.com/"],
+  allLabs:["All labs list","https://portswigger.net/web-security/all-labs"],
+  juice:["OWASP Juice Shop","https://owasp.org/www-project-juice-shop/"],
+};
+const ps = (label, slug) => [label, PS(slug)];
+
+// [id, category, text, links]
+const WEEKS = [
+ {n:1,title:"Burp setup + SQL injection",tasks:[
+  ["w1a","main","Open Burp Community in Kali, use Burp's built-in browser, and intercept your first request",[L.burpStart]],
+  ["w1b","main","Read the SQL injection topic, then finish every Apprentice SQLi lab",[ps("SQL injection","sql-injection")]],
+  ["w1c","found","Bandit levels 0–12",[L.bandit]],
+  ["w1d","repo","Clone your repo and fill in the 'About me' section of README.md",[L.repo]],
+  ["w1e","repo","First write-up: writeups/portswigger/sql-injection.md (use _TEMPLATE.md)",[]],
+ ]},
+ {n:2,title:"Authentication + Path traversal",tasks:[
+  ["w2a","main","Authentication: all Apprentice labs",[ps("Authentication","authentication")]],
+  ["w2b","main","Path traversal: all Apprentice labs",[ps("Path traversal","file-path-traversal")]],
+  ["w2c","found","Bandit levels 13–22",[L.bandit]],
+  ["w2d","code","Build tools/01-login-bot: log in with requests.Session, handling the CSRF token and cookies",[L.requests]],
+  ["w2e","repo","Write-ups for authentication + path traversal",[]],
+ ]},
+ {n:3,title:"Access control + Business logic",tasks:[
+  ["w3a","main","Access control / IDOR: all Apprentice labs",[ps("Access control","access-control")]],
+  ["w3b","main","Business logic: all Apprentice labs",[ps("Logic flaws","logic-flaws")]],
+  ["w3c","found","Networking: OSI vs TCP/IP, IP and subnets, DNS, the TCP handshake",[L.messer]],
+  ["w3d","found","Wireshark: capture yourself loading a website, then find the DNS query, TCP handshake and TLS handshake",[L.wireshark]],
+  ["w3e","repo","notes/networking.md: answer 'what happens when you type google.com and press Enter'",[]],
+ ]},
+ {n:4,title:"Cross-site scripting (XSS)",cp:true,tasks:[
+  ["w4a","main","XSS: reflected, stored and DOM (all Apprentice labs)",[ps("XSS","cross-site-scripting")]],
+  ["w4b","found","HTTP in depth: headers, cookie flags (HttpOnly, Secure, SameSite), CORS, TLS",[L.mdnHttp]],
+  ["w4c","code","Build tools/02-port-scanner: socket based, with threads and a timeout",[]],
+  ["w4d","check","CHECKPOINT: at least 4 public write-ups in your repo",[]],
+  ["w4e","check","Write retros/week-4.md and post your first progress update on LinkedIn",[]],
+ ]},
+ {n:5,title:"CSRF + OS command injection",tasks:[
+  ["w5a","main","CSRF: all Apprentice labs",[ps("CSRF","csrf")]],
+  ["w5b","main","OS command injection: all Apprentice labs",[ps("Command injection","os-command-injection")]],
+  ["w5c","found","Bandit levels 23–33",[L.bandit]],
+  ["w5d","code","Start vuln-app/: a deliberately vulnerable MERN or Next.js app with 5 bugs (NoSQLi, IDOR, XSS, CSRF, command injection). Localhost only!",[]],
+ ]},
+ {n:6,title:"SSRF + File upload",tasks:[
+  ["w6a","main","SSRF: all Apprentice labs",[ps("SSRF","ssrf")]],
+  ["w6b","main","File upload: all Apprentice labs",[ps("File upload","file-upload")]],
+  ["w6c","found","Linux: permissions, SUID, processes, cron, systemd services",[L.linuxJourney]],
+  ["w6d","code","Exploit your own vuln-app, then fix every bug",[]],
+  ["w6e","repo","vuln-app/WRITEUP.md: each bug with the attack, the root cause and the fix",[]],
+ ]},
+ {n:7,title:"JWT + OAuth",tasks:[
+  ["w7a","main","JWT attacks: all Apprentice labs",[ps("JWT","jwt")]],
+  ["w7b","main","OAuth: all Apprentice labs",[ps("OAuth","oauth")]],
+  ["w7c","found","TryHackMe free room: Linux privilege escalation",[L.thmPrivesc]],
+  ["w7d","code","Build tools/03-jwt-tool: decode a token, test alg:none, brute-force a weak secret from a wordlist",[]],
+ ]},
+ {n:8,title:"SSTI, XXE + Info disclosure",cp:true,tasks:[
+  ["w8a","main","Server-side template injection: Apprentice labs",[ps("SSTI","server-side-template-injection")]],
+  ["w8b","main","XXE + Information disclosure: Apprentice labs",[ps("XXE","xxe"),ps("Info disclosure","information-disclosure")]],
+  ["w8c","found","picoCTF: 10 challenges in Web Exploitation and General Skills",[L.pico]],
+  ["w8d","check","CHECKPOINT: every Apprentice lab on PortSwigger solved",[L.allLabs]],
+  ["w8e","check","retros/week-8.md + progress post",[]],
+ ]},
+ {n:9,title:"Practitioner: SQLi + XSS",tasks:[
+  ["w9a","main","Practitioner SQLi labs (including blind SQLi)",[ps("SQL injection","sql-injection")]],
+  ["w9b","main","Practitioner XSS labs",[ps("XSS","cross-site-scripting")]],
+  ["w9c","found","Read the OWASP Top 10 properly, then write notes/owasp-top10.md",[L.owasp10]],
+  ["w9d","code","LeetCode: 3 easy problems (arrays, strings, hash maps)",[L.neet,L.leet]],
+ ]},
+ {n:10,title:"Practitioner: access control, SSRF, auth",tasks:[
+  ["w10a","main","Practitioner labs: access control, SSRF, authentication",[L.allLabs]],
+  ["w10b","found","Code review: audit an open-source Express or Laravel app for OWASP Top 10 bugs",[L.cheat]],
+  ["w10c","repo","code-review/<project>.md: what you checked and what you found",[]],
+  ["w10d","code","LeetCode: 3 easy problems",[L.neet]],
+ ]},
+ {n:11,title:"Recon methodology",tasks:[
+  ["w11a","main","Recon: subdomains, live hosts, content discovery, and finding endpoints in JS files",[L.subfinder,L.httpx,L.ffuf]],
+  ["w11b","found","Read 10 disclosed bug reports, then write notes/bug-reports.md: the pattern in each",[L.hacktivity]],
+  ["w11c","code","Build tools/04-recon: Python that chains subfinder → httpx and saves the results",[]],
+  ["w11d","code","LeetCode: 3 problems",[L.neet]],
+ ]},
+ {n:12,title:"First real target + retro",cp:true,tasks:[
+  ["w12a","main","Pick a VDP or bug bounty program and read its scope and rules twice",[L.h1dir,L.bugcrowd]],
+  ["w12b","main","Hunt for 10+ hours IN SCOPE ONLY. Keep findings in bug-bounty/private/",[]],
+  ["w12c","found","Redo the labs in your 2 weakest topics without looking at solutions",[]],
+  ["w12d","check","retros/week-12.md: what worked, what didn't. Bring it to Claude to plan months 4–6",[]],
+  ["w12e","code","LeetCode: 3 problems",[L.neet]],
+ ]},
+];
+
+const MONTHS = [
+ {id:"m1",title:"Months 4–6 · Practitioner + first hunting",tasks:[
+  ["m1a","main","Finish ALL Practitioner labs on PortSwigger",[L.allLabs]],
+  ["m1b","main","Play 6 CTFs (2 per month) and write up at least one challenge from each",[L.ctftime]],
+  ["m1c","main","Hunt on public programs every week until your first valid report",[L.h1dir,L.bugcrowd]],
+  ["m1d","found","HTB Academy free web modules, or OWASP Juice Shop locally",[L.htbAcademy,L.juice]],
+  ["m1e","code","LeetCode: 5 a week, 60 problems total",[L.neet]],
+ ]},
+ {id:"m2",title:"Months 6–9 · Expert labs + Google VRP",tasks:[
+  ["m2a","main","Solve 10+ Expert labs on PortSwigger",[L.allLabs]],
+  ["m2b","main","Study the Google Bug Hunters learning material and start hunting in Google VRP scope",[L.ghvrp]],
+  ["m2c","found","Secure code review of 3 Node, Laravel or Next.js projects",[L.cheat]],
+  ["m2d","found","Cloud security basics: flaws.cloud and flaws2.cloud",[L.flaws,L.flaws2]],
+  ["m2e","code","LeetCode: move to medium problems",[L.neet]],
+ ]},
+ {id:"m3",title:"Months 9–12 · Certify + apply",tasks:[
+  ["m3a","check","Pass Burp Suite Certified Practitioner (BSCP), about $99",[L.bscp]],
+  ["m3b","code","Polish 1–2 of your tools into real open-source projects with a README and tests",[]],
+  ["m3c","check","Apply: Google internships (applications usually open Aug–Oct), AppSec roles in Lahore, remote roles",[L.gcareers]],
+  ["m3d","repo","Update your resume and LinkedIn with write-ups, bugs found and CTF results",[]],
+  ["m3e","found","Mock interviews: security knowledge, security design and coding",[]],
+ ]},
+ {id:"m4",title:"Year 2 · Go deep",tasks:[
+  ["m4a","check","OSWE (advanced web exploitation), once you can afford it",[L.oswe]],
+  ["m4b","main","Serious bug bounty: Google VRP Hall of Fame",[L.ghvrp]],
+  ["m4c","check","Google security engineer interviews",[L.gcareers]],
+ ]},
+];
+
+const RESOURCES = [
+ {t:"🎯 Main track (web security)",l:[["PortSwigger Web Security Academy","https://portswigger.net/web-security"],["All labs list","https://portswigger.net/web-security/all-labs"],["Burp Suite Community","https://portswigger.net/burp/communitydownload"],["OWASP Juice Shop","https://owasp.org/www-project-juice-shop/"]]},
+ {t:"🧱 Linux + networking",l:[["OverTheWire Bandit","https://overthewire.org/wargames/bandit/"],["Linux Journey","https://linuxjourney.com/"],["Professor Messer (Network+ / Security+)","https://www.professormesser.com/"],["MDN: HTTP","https://developer.mozilla.org/en-US/docs/Web/HTTP"],["Wireshark","https://www.wireshark.org/"]]},
+ {t:"🐍 Coding",l:[["Automate the Boring Stuff (free book)","https://automatetheboringstuff.com/"],["Python requests docs","https://requests.readthedocs.io/"],["NeetCode roadmap","https://neetcode.io/roadmap"],["LeetCode","https://leetcode.com/problemset/"],["CS50x (Harvard)","https://cs50.harvard.edu/x/"]]},
+ {t:"🧪 Practice platforms",l:[["TryHackMe","https://tryhackme.com/"],["Hack The Box Academy","https://academy.hackthebox.com/"],["picoCTF","https://play.picoctf.org/practice"],["pwn.college (low-level)","https://pwn.college/"],["CTFtime (CTF calendar)","https://ctftime.org/"]]},
+ {t:"💰 Bug bounty",l:[["Google Bug Hunters","https://bughunters.google.com/"],["HackerOne programs","https://hackerone.com/directory/programs"],["HackerOne Hacktivity (read reports)","https://hackerone.com/hacktivity"],["Bugcrowd","https://bugcrowd.com/engagements"]]},
+ {t:"📚 Reference",l:[["OWASP Top 10","https://owasp.org/www-project-top-ten/"],["OWASP Cheat Sheets","https://cheatsheetseries.owasp.org/"],["HackTricks","https://book.hacktricks.wiki/"],["PayloadsAllTheThings","https://github.com/swisskyrepo/PayloadsAllTheThings"]]},
+ {t:"🏅 Certifications (later)",l:[["BSCP (Burp Certified Practitioner)","https://portswigger.net/web-security/certification"],["OSWE (OffSec)","https://www.offsec.com/courses/web-300/"]]},
+ {t:"🏢 Career",l:[["Google Careers","https://www.google.com/about/careers/applications/"],["Your GitHub repo","https://github.com/RamZan457/security-journey"]]},
+];
+
+// ---------- state ----------
+const KEY="secjourney.v1";
+const iso=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,10)};
+const today=()=>iso(new Date());
+function load(){
+  try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&typeof s==="object")return{done:s.done||{},log:s.log||[],start:s.start||today(),theme:s.theme||null}}catch(e){}
+  return{done:{},log:[],start:today(),theme:null};
+}
+let state=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+save();
+
+const allTasks=[...WEEKS.flatMap(w=>w.tasks),...MONTHS.flatMap(m=>m.tasks)];
+function currentWeek(){
+  const days=Math.floor((new Date(today())-new Date(state.start))/864e5);
+  return Math.max(1,Math.floor(days/7)+1);
+}
+
+// ---------- render ----------
+function taskHTML(t){
+  const [id,cat,text,links]=t, done=!!state.done[id];
+  const catName={main:"Main",found:"Foundations",code:"Code",repo:"Repo",check:"Checkpoint"}[cat];
+  const lk=links&&links.length?`<span class="links">${links.map(([a,u])=>`<a href="${u}" target="_blank" rel="noopener">${a}</a>`).join("")}</span>`:"";
+  return `<li class="${done?"done":""}"><input type="checkbox" id="cb-${id}-%S" data-id="${id}" ${done?"checked":""}><label for="cb-${id}-%S"><span class="cat ${cat}">${catName}</span><span class="t">${text}</span>${lk}</label></li>`;
+}
+function groupHTML(g,key,label,scope){
+  const isNow=g.n&&g.n===currentWeek();
+  const badges=(g.cp?`<span class="badge cp hide-sm">Checkpoint</span>`:"")+(isNow?`<span class="badge now">Now</span>`:"");
+  return `<details class="week ${isNow?"current":""}" data-group="${key}" ${isNow?"open":""}>
+    <summary><span class="wk">${label}</span><span class="wtitle">${g.title}</span>${badges}<span class="count" data-count="${key}"></span></summary>
+    <div class="mini"><i data-mini="${key}"></i></div>
+    <ul class="tasks">${g.tasks.map(t=>taskHTML(t).replaceAll("%S",scope)).join("")}</ul></details>`;
+}
+function render(){
+  document.getElementById("weekList").innerHTML=WEEKS.map(w=>groupHTML(w,"w"+w.n,"WEEK "+String(w.n).padStart(2,"0"),"w")).join("");
+  document.getElementById("monthList").innerHTML=MONTHS.map(m=>groupHTML(m,m.id,"PHASE","m")).join("");
+  document.getElementById("resList").innerHTML=RESOURCES.map(r=>`<div class="card"><h2>${r.t}</h2><ul>${r.l.map(([a,u])=>`<li><a href="${u}" target="_blank" rel="noopener">${a}</a></li>`).join("")}</ul></div>`).join("");
+  const cw=currentWeek(), wk=WEEKS.find(w=>w.n===cw);
+  document.getElementById("thisWeekTitle").textContent=wk?`This week · Week ${cw}: ${wk.title}`:`Week ${cw}: you're past the 12-week plan. Open the Months tab.`;
+  document.getElementById("thisWeek").innerHTML=wk?`<ul class="tasks" style="padding:0">${wk.tasks.map(t=>taskHTML(t).replaceAll("%S","t")).join("")}</ul>`:"";
+  document.getElementById("startDate").value=state.start;
+  refresh();
+}
+function refresh(){
+  const doneCount=allTasks.filter(t=>state.done[t[0]]).length, pct=Math.round(doneCount/allTasks.length*100);
+  document.getElementById("totalBar").style.width=pct+"%";
+  document.getElementById("totalLabel").textContent=`${pct}% complete · ${doneCount}/${allTasks.length} tasks`;
+  document.getElementById("sTasks").textContent=doneCount;
+  const cw=currentWeek();
+  document.getElementById("sWeek").textContent=cw<=12?cw:"12+";
+  document.getElementById("phaseLabel").textContent=cw<=12?"Phase: 12-week sprint":"Phase: months 4–12";
+  [...WEEKS.map(w=>["w"+w.n,w.tasks]),...MONTHS.map(m=>[m.id,m.tasks])].forEach(([k,ts])=>{
+    const d=ts.filter(t=>state.done[t[0]]).length, c=document.querySelector(`[data-count="${k}"]`), m=document.querySelector(`[data-mini="${k}"]`);
+    if(c){c.textContent=`${d}/${ts.length}`;c.classList.toggle("full",d===ts.length)}
+    if(m)m.style.width=(d/ts.length*100)+"%";
+  });
+  document.querySelectorAll("ul.tasks input[data-id]").forEach(cb=>{const on=!!state.done[cb.dataset.id];cb.checked=on;cb.closest("li").classList.toggle("done",on)});
+  renderStreak();
+}
+function renderStreak(){
+  const set=new Set(state.log), t=today();
+  const y=iso(new Date(Date.now()-864e5));
+  let d=new Date(); if(!set.has(t)) d=new Date(Date.now()-864e5);
+  let streak=0; while(set.has(iso(d))){streak++;d=new Date(d.getTime()-864e5)}
+  document.getElementById("sStreak").textContent=streak;
+  document.getElementById("sDays").textContent=set.size;
+  const btn=document.getElementById("logBtn");
+  btn.disabled=set.has(t); btn.textContent=set.has(t)?"✓ Logged today":"✓ I studied today";
+  let msg="";
+  if(set.has(t)) msg=`<div class="alert ok">Done for today. ${streak} day streak. Commit and push your work.</div>`;
+  else if(set.size&&!set.has(y)) msg=`<div class="alert warn">You missed yesterday. Don't miss two in a row. Log today, even if it's only 1 hour.</div>`;
+  document.getElementById("streakMsg").innerHTML=msg;
+  const heat=document.getElementById("heat"); let h="";
+  const end=new Date(), dow=end.getDay(), days=7*11+dow+1;
+  for(let i=days-1;i>=0;i--){const k=iso(new Date(end.getTime()-i*864e5));h+=`<i class="${set.has(k)?"on":""} ${k===t?"today":""}" title="${k}"></i>`}
+  heat.innerHTML=h;
+}
+
+// ---------- events ----------
+document.addEventListener("change",e=>{
+  const id=e.target.dataset&&e.target.dataset.id;
+  if(id){if(e.target.checked)state.done[id]=1;else delete state.done[id];save();refresh()}
+});
+document.getElementById("logBtn").onclick=()=>{if(!state.log.includes(today())){state.log.push(today());save();renderStreak()}};
+document.getElementById("startDate").onchange=e=>{if(e.target.value){state.start=e.target.value;save();render()}};
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  document.querySelectorAll("section").forEach(s=>s.hidden=s.id!==b.dataset.tab);
+  try{localStorage.setItem(KEY+".tab",b.dataset.tab)}catch(e){}
+});
+try{const tab=localStorage.getItem(KEY+".tab");if(tab){const b=document.querySelector(`nav button[data-tab="${tab}"]`);if(b)b.click()}}catch(e){}
+function applyTheme(){if(state.theme)document.documentElement.setAttribute("data-theme",state.theme);else document.documentElement.removeAttribute("data-theme")}
+document.getElementById("themeBtn").onclick=()=>{
+  const dark=state.theme?state.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  state.theme=dark?"light":"dark";save();applyTheme();
+};
+document.getElementById("exportBtn").onclick=()=>{
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}));
+  a.download=`security-journey-backup-${today()}.json`;a.click();
+};
+document.getElementById("importFile").onchange=e=>{
+  const f=e.target.files[0]; if(!f)return;
+  f.text().then(txt=>{try{const s=JSON.parse(txt);if(!s.done)throw 0;state={done:s.done,log:s.log||[],start:s.start||today(),theme:s.theme||null};save();applyTheme();render();alert("Backup imported.")}catch(err){alert("That file isn't a valid backup.")}});
+  e.target.value="";
+};
+document.getElementById("resetBtn").onclick=()=>{if(confirm("Erase all progress in this browser? Export a backup first if you want to keep it.")){state={done:{},log:[],start:today(),theme:state.theme};save();render()}};
+applyTheme();render();
+</script>
+</body>
+</html>

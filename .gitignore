@@ -1,0 +1,7 @@
+bug-bounty/private/
+.env
+*.pcap
+*.pcapng
+__pycache__/
+node_modules/
+output/
